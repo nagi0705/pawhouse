@@ -1,6 +1,10 @@
 <template>
   <div>
-    <NuxtPage />
+    <UContainer>
+      <UCard>
+        <NuxtPage />
+      </UCard>
+    </UContainer>
   </div>
 </template>
 

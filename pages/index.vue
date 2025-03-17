@@ -1,20 +1,31 @@
 <template>
     <UContainer>
         <UCard>
-            <h1 class="text-2xl font-bold">ペット可物件リスト</h1>
+            <h1 class="text-2xl font-bold mb-4">ペット可物件リスト</h1>
 
-            <ul v-if="properties.length">
-                <li v-for="property in properties" :key="property.id" class="border-b py-2">
+            <!-- 🔍 フィルター UI（ペットの種類選択） -->
+            <label for="pet-filter" class="block font-medium">ペットの種類で絞り込み:</label>
+            <select id="pet-filter" v-model="selectedPet" class="mb-4 p-2 border rounded">
+                <option value="">すべて</option>
+                <option value="犬">犬</option>
+                <option value="猫">猫</option>
+                <option value="鳥">鳥</option>
+                <option value="エキゾチック">エキゾチック</option>
+                <option value="その他">その他</option>
+            </select>
+
+            <ul v-if="filteredProperties.length">
+                <li v-for="property in filteredProperties" :key="property.id" class="border-b py-2">
                     <NuxtLink :to="`/property/${property.id}`" class="text-blue-500 hover:underline">
                         <strong>{{ property.name }}</strong> - {{ property.location }} - ¥{{
                             property.price.toLocaleString() }}
                     </NuxtLink>
-                    <p>ペット可: {{ property.petsAllowed.join(', ') }}</p>
-                    <p>設備: {{ property.features.join(', ') }}</p>
+                    <p>ペット可: {{ property.petsAllowed ? property.petsAllowed.join(", ") : "情報なし" }}</p>
+                    <p>設備: {{ property.features ? property.features.join(", ") : "情報なし" }}</p>
                 </li>
             </ul>
 
-            <p v-else>物件情報を読み込み中...</p>
+            <p v-else>該当する物件がありません。</p>
         </UCard>
 
         <!-- 地図コンポーネントを追加 -->
@@ -23,22 +34,38 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { db } from "@/utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import MapView from "@/components/MapView.vue"; // 地図コンポーネントの追加
 
-const properties = ref([]);
+const properties = ref([]); // 物件データ
+const selectedPet = ref(""); // 選択されたペットの種類
 
+// 🔹 Firestore から物件データを取得
 onMounted(async () => {
     try {
         const querySnapshot = await getDocs(collection(db, "properties"));
-        properties.value = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+        properties.value = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                petsAllowed: Array.isArray(data.petsAllowed) ? data.petsAllowed : [] // 🔹 null 回避
+            };
+        });
+
+        console.log("✅ Firestoreから取得したデータ:", properties.value);
     } catch (error) {
         console.error("データ取得エラー:", error);
     }
+});
+
+// 🔹 フィルタリングされた物件リスト
+const filteredProperties = computed(() => {
+    if (!selectedPet.value) {
+        return properties.value;
+    }
+    return properties.value.filter(property => property.petsAllowed.includes(selectedPet.value));
 });
 </script>

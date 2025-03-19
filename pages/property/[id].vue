@@ -11,6 +11,15 @@
             <h2 class="mt-4 text-xl font-bold">設備</h2>
             <p>{{ property.features.join(", ") }}</p>
 
+            <!-- 建築仕様・ペット向け設備の詳細をリスト表示（追加部分） -->
+            <h2 class="mt-4 text-xl font-bold">建築仕様・ペット向け設備の詳細</h2>
+            <ul v-if="property.features && property.features.length" class="list-disc list-inside">
+                <li v-for="(item, index) in property.features" :key="index">
+                    {{ item }}
+                </li>
+            </ul>
+            <p v-else>建築仕様・ペット向け設備の情報はありません</p>
+
             <!-- 地図コンポーネントを表示 -->
             <MapView :center="[property.latitude, property.longitude]" />
         </UCard>

@@ -33,8 +33,8 @@
             <p v-else>該当する物件がありません。</p>
         </UCard>
 
-        <!-- 地図コンポーネントを追加 -->
-        <MapView />
+        <!-- ★ 地図は表示しないので削除 ★ -->
+        <!-- <MapView :properties="filteredProperties" :center="[35.6895, 139.6917]" :zoom="12" /> -->
     </UContainer>
 </template>
 
@@ -42,13 +42,10 @@
 import { ref, computed, onMounted } from "vue";
 import { db } from "@/utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
-import MapView from "@/components/MapView.vue"; // 地図コンポーネントの追加
 
 // 🔹 お気に入り機能を利用するための composable を読み込み
-//    (実際にファイルが "/components/useFavoriteProperties.js" にある場合)
 import { useFavoriteProperties } from "@/components/useFavoriteProperties.js";
 
-// 🔹 お気に入り機能用の関数・変数を取得
 const { favoriteIds, addFavorite, removeFavorite, isFavorite } = useFavoriteProperties();
 
 const properties = ref([]); // 物件データ
@@ -63,7 +60,7 @@ onMounted(async () => {
             return {
                 id: doc.id,
                 ...data,
-                petsAllowed: Array.isArray(data.petsAllowed) ? data.petsAllowed : [] // 🔹 null 回避
+                petsAllowed: Array.isArray(data.petsAllowed) ? data.petsAllowed : []
             };
         });
 

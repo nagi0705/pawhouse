@@ -43,7 +43,8 @@
             <!-- ▲▲▲ ここまでお気に入り機能 ▲▲▲ -->
 
             <!-- 地図コンポーネントを表示 -->
-            <MapView :center="[property.latitude, property.longitude]" />
+            <!-- ※ 単一物件だけを配列にして渡すことで、マーカーは1つだけになる -->
+            <MapView :properties="[property]" :center="[property.latitude, property.longitude]" />
         </UCard>
         <p v-else>物件情報を取得中...</p>
     </UContainer>

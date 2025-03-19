@@ -3,7 +3,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "あなたのAPIキー",
+  apiKey: "AIzaSyDFyjyPdDAFOB05l7V0pwtdpEQphNO10AA",
   authDomain: "pawhouse-511c8.firebaseapp.com",
   projectId: "pawhouse-511c8",
   storageBucket: "pawhouse-511c8.appspot.com",

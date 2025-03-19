@@ -1,3 +1,4 @@
+<!-- /pages/index.vue -->
 <template>
     <UContainer>
         <UCard>
@@ -18,23 +19,22 @@
                 <li v-for="property in filteredProperties" :key="property.id" class="border-b py-2">
                     <NuxtLink :to="`/property/${property.id}`" class="text-blue-500 hover:underline">
                         <strong>{{ property.name }}</strong> - {{ property.location }} - ¥{{
-                            property.price.toLocaleString() }}
+                            property.price?.toLocaleString() }}
                     </NuxtLink>
                     <p>ペット可: {{ property.petsAllowed ? property.petsAllowed.join(", ") : "情報なし" }}</p>
                     <p>設備: {{ property.features ? property.features.join(", ") : "情報なし" }}</p>
-
-                    <!-- 🏷 お気に入りボタンの追加 -->
-                    <button class="ml-4 px-2 py-1 border rounded text-sm" @click="toggleFavorite(property.id)">
-                        {{ isFavorite(property.id) ? "お気に入り解除" : "お気に入り追加" }}
-                    </button>
                 </li>
             </ul>
 
             <p v-else>該当する物件がありません。</p>
         </UCard>
 
-        <!-- ★ 地図は表示しないので削除 ★ -->
-        <!-- <MapView :properties="filteredProperties" :center="[35.6895, 139.6917]" :zoom="12" /> -->
+        <!-- 🔻 ここに 「新規物件登録」ボタンを追加 -->
+        <UCard class="mt-4">
+            <NuxtLink to="/property/new" class="inline-block px-4 py-2 bg-green-500 text-white rounded">
+                新規物件を登録
+            </NuxtLink>
+        </UCard>
     </UContainer>
 </template>
 
@@ -43,15 +43,10 @@ import { ref, computed, onMounted } from "vue";
 import { db } from "@/utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
-// 🔹 お気に入り機能を利用するための composable を読み込み
-import { useFavoriteProperties } from "@/components/useFavoriteProperties.js";
+const properties = ref([]);
+const selectedPet = ref("");
 
-const { favoriteIds, addFavorite, removeFavorite, isFavorite } = useFavoriteProperties();
-
-const properties = ref([]); // 物件データ
-const selectedPet = ref(""); // 選択されたペットの種類
-
-// 🔹 Firestore から物件データを取得
+// Firestore から物件データを取得
 onMounted(async () => {
     try {
         const querySnapshot = await getDocs(collection(db, "properties"));
@@ -70,7 +65,7 @@ onMounted(async () => {
     }
 });
 
-// 🔹 フィルタリングされた物件リスト
+// フィルタリングされた物件リスト
 const filteredProperties = computed(() => {
     if (!selectedPet.value) {
         return properties.value;
@@ -79,13 +74,4 @@ const filteredProperties = computed(() => {
         property.petsAllowed.includes(selectedPet.value)
     );
 });
-
-// 🔹 お気に入り追加/削除を切り替える関数
-const toggleFavorite = (propertyId) => {
-    if (isFavorite(propertyId)) {
-        removeFavorite(propertyId);
-    } else {
-        addFavorite(propertyId);
-    }
-};
 </script>

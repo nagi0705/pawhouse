@@ -1,10 +1,11 @@
+<!-- /pages/property/[id].vue -->
 <template>
     <UContainer>
         <UCard v-if="property">
             <h1 class="text-2xl font-bold">{{ property.name }}</h1>
             <p class="text-gray-600">{{ property.location }}</p>
             <p class="mt-2 text-lg font-semibold">
-                価格: ¥{{ property.price.toLocaleString() }}
+                価格: ¥{{ property.price?.toLocaleString() }}
             </p>
 
             <h2 class="mt-4 text-xl font-bold">ペット可</h2>
@@ -41,10 +42,6 @@
                 </p>
             </div>
             <!-- ▲▲▲ ここまでお気に入り機能 ▲▲▲ -->
-
-            <!-- 地図コンポーネントを表示 -->
-            <!-- ※ 単一物件だけを配列にして渡すことで、マーカーは1つだけになる -->
-            <MapView :properties="[property]" :center="[property.latitude, property.longitude]" />
         </UCard>
         <p v-else>物件情報を取得中...</p>
     </UContainer>
@@ -55,21 +52,21 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { db } from "@/utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import MapView from "@/components/MapView.vue";
-
-// ★ お気に入り機能をインポート ★
 import { useFavoriteProperties } from "@/components/useFavoriteProperties.js";
 
-// お気に入り用のメソッド・変数を取得
+// お気に入り機能
 const { favoriteIds, addFavorite, removeFavorite, isFavorite } = useFavoriteProperties();
 
 const route = useRoute();
-const property = ref(null);
-
-// ユニークなIDとして Firestore のドキュメントIDを使う
+// propertyId を route.params.id から取得
 const propertyId = computed(() => route.params.id);
 
+// Firestoreから取得した物件データ
+const property = ref(null);
+
+// 物件データを読み込み
 onMounted(async () => {
+    console.log("Detail page propertyId:", propertyId.value);
     try {
         const docRef = doc(db, "properties", propertyId.value);
         const docSnap = await getDoc(docRef);
@@ -84,7 +81,7 @@ onMounted(async () => {
     }
 });
 
-// お気に入り追加/削除を切り替える関数
+// お気に入りのトグル
 const toggleFavorite = (id) => {
     if (isFavorite(id)) {
         removeFavorite(id);

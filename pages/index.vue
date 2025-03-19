@@ -22,6 +22,11 @@
                     </NuxtLink>
                     <p>ペット可: {{ property.petsAllowed ? property.petsAllowed.join(", ") : "情報なし" }}</p>
                     <p>設備: {{ property.features ? property.features.join(", ") : "情報なし" }}</p>
+
+                    <!-- 🏷 お気に入りボタンの追加 -->
+                    <button class="ml-4 px-2 py-1 border rounded text-sm" @click="toggleFavorite(property.id)">
+                        {{ isFavorite(property.id) ? "お気に入り解除" : "お気に入り追加" }}
+                    </button>
                 </li>
             </ul>
 
@@ -38,6 +43,13 @@ import { ref, computed, onMounted } from "vue";
 import { db } from "@/utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import MapView from "@/components/MapView.vue"; // 地図コンポーネントの追加
+
+// 🔹 お気に入り機能を利用するための composable を読み込み
+//    (実際にファイルが "/components/useFavoriteProperties.js" にある場合)
+import { useFavoriteProperties } from "@/components/useFavoriteProperties.js";
+
+// 🔹 お気に入り機能用の関数・変数を取得
+const { favoriteIds, addFavorite, removeFavorite, isFavorite } = useFavoriteProperties();
 
 const properties = ref([]); // 物件データ
 const selectedPet = ref(""); // 選択されたペットの種類
@@ -66,6 +78,17 @@ const filteredProperties = computed(() => {
     if (!selectedPet.value) {
         return properties.value;
     }
-    return properties.value.filter(property => property.petsAllowed.includes(selectedPet.value));
+    return properties.value.filter(property =>
+        property.petsAllowed.includes(selectedPet.value)
+    );
 });
+
+// 🔹 お気に入り追加/削除を切り替える関数
+const toggleFavorite = (propertyId) => {
+    if (isFavorite(propertyId)) {
+        removeFavorite(propertyId);
+    } else {
+        addFavorite(propertyId);
+    }
+};
 </script>

@@ -16,32 +16,23 @@
 
             <!-- 建築仕様・ペット向け設備の詳細 -->
             <h2 class="mt-4 text-xl font-bold">建築仕様・ペット向け設備の詳細</h2>
-            <ul v-if="property.features && property.features.length" class="list-disc list-inside">
-                <li v-for="(item, index) in property.features" :key="index">
-                    {{ item }}
-                </li>
+            <ul v-if="property.features?.length" class="list-disc list-inside">
+                <li v-for="(item, index) in property.features" :key="index">{{ item }}</li>
             </ul>
             <p v-else>建築仕様・ペット向け設備の情報はありません</p>
 
-            <!-- ▼▼▼ ここからお気に入り機能 ▼▼▼ -->
+            <!-- ✅ お気に入りボタン -->
             <div class="mt-4">
-                <!-- ハートアイコン + ボタン -->
-                <button class="px-3 py-1 border rounded" @click="toggleFavorite(propertyId)">
-                    <!-- お気に入り状態に応じてハートを出し分け -->
-                    <span v-if="isFavorite(propertyId)" style="color: red;">
-                        ❤️ お気に入り中
-                    </span>
-                    <span v-else>
-                        ♡ お気に入り追加
-                    </span>
+                <button class="btn btn-favorite" :class="isFavorite(propertyId) ? 'active' : ''"
+                    @click="toggleFavorite(propertyId)">
+                    <span v-if="isFavorite(propertyId)">❤️ お気に入り中</span>
+                    <span v-else>♡ お気に入り追加</span>
                 </button>
 
-                <!-- お気に入り数表示 -->
                 <p class="mt-2 text-sm text-gray-500">
-                    現在のお気に入り登録数: {{ favoriteIds.length }}
+                    現在のお気に入り登録数: {{ favoriteIds?.length || 0 }}
                 </p>
             </div>
-            <!-- ▲▲▲ ここまでお気に入り機能 ▲▲▲ -->
         </UCard>
         <p v-else>物件情報を取得中...</p>
     </UContainer>
@@ -56,15 +47,11 @@ import { useFavoriteProperties } from "@/components/useFavoriteProperties.js";
 
 // お気に入り機能
 const { favoriteIds, addFavorite, removeFavorite, isFavorite } = useFavoriteProperties();
-
 const route = useRoute();
-// propertyId を route.params.id から取得
 const propertyId = computed(() => route.params.id);
-
-// Firestoreから取得した物件データ
 const property = ref(null);
 
-// 物件データを読み込み
+// 物件データを取得
 onMounted(async () => {
     console.log("Detail page propertyId:", propertyId.value);
     try {
@@ -90,3 +77,31 @@ const toggleFavorite = (id) => {
     }
 };
 </script>
+
+<style scoped>
+/* ✅ ボタンの共通スタイル */
+.btn {
+    padding: 8px 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease;
+}
+
+/* ✅ お気に入りボタン */
+.btn-favorite {
+    background: #6b7280;
+    /* グレー */
+    color: white;
+}
+
+.btn-favorite.active {
+    background: #ef4444;
+    /* 赤 */
+}
+
+.btn-favorite:hover {
+    background: #dc2626;
+    /* 赤 (ホバー時) */
+}
+</style>

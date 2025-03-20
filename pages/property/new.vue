@@ -52,22 +52,16 @@
             <!-- 設備 (カンマ区切り入力を配列に変換) -->
             <div class="mb-4">
                 <label class="block font-medium">設備（カンマ区切り）</label>
-                <input
-                    v-model="featuresInput"
-                    type="text"
-                    class="border p-2 w-full"
-                    placeholder="バルコニー,エレベーター,専用庭 など"
-                />
+                <input v-model="featuresInput" type="text" class="border p-2 w-full"
+                    placeholder="バルコニー,エレベーター,専用庭 など" />
                 <p class="text-sm text-gray-500 mt-1">
                     カンマで区切って入力してください。<br />
                     例: 防臭床,滑り止め床,バリアフリー など
                 </p>
             </div>
 
-            <!-- 登録ボタン -->
-            <button @click="createProperty" class="px-4 py-2 bg-blue-500 text-white rounded">
-                登録
-            </button>
+            <!-- ✅ 修正後の登録ボタン -->
+            <button class="btn btn-primary" @click="createProperty">登録</button>
 
             <!-- 成功メッセージ -->
             <p v-if="message" class="mt-2 text-green-500">{{ message }}</p>
@@ -100,12 +94,12 @@ async function geocodeAddressWithNominatim(address) {
     // Nominatimの公共サーバーを呼び出す
     // User-Agent ヘッダーを指定するのが推奨
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encoded}`,
-      {
-        headers: {
-          "User-Agent": "Nuxt3 App (example@example.com)"
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encoded}`,
+        {
+            headers: {
+                "User-Agent": "Nuxt3 App (example@example.com)"
+            }
         }
-      }
     );
 
     const data = await response.json();
@@ -163,5 +157,26 @@ async function createProperty() {
 </script>
 
 <style scoped>
-/* 必要に応じて追加のCSS */
+/* ✅ ボタンの共通スタイル */
+.btn {
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* ✅ 登録ボタンのスタイル */
+.btn-primary {
+    background: #2563eb;
+    /* Nuxt UI primary */
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1e40af;
+    /* 青 (ホバー時) */
+    transform: scale(1.05);
+    /* 軽い拡大 */
+}
 </style>
